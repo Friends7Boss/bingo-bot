@@ -1,5 +1,5 @@
-aiogram==3.x
-Flask==2.x
+aiogram>=3.4.1
+Flask>=2.0
 gunicorn
 psycopg2-binary
 SQLAlchemy
