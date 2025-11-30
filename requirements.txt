@@ -1,0 +1,7 @@
+aiogram==3.x
+Flask==2.x
+gunicorn
+psycopg2-binary
+SQLAlchemy
+python-dotenv
+requests
