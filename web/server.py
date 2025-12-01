@@ -3,7 +3,7 @@ import os
 import asyncio
 from database.db import init_db
 from flask import Flask, request, jsonify
-from database.db import init_db, get_session
+# from database.db import init_db, get_session
 from database.models import Deposit, User
 from decimal import Decimal
 
