@@ -1,19 +1,32 @@
-# database/db.py
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Use echo=False in production to reduce noise
-engine = create_engine(DATABASE_URL, echo=False, future=True)
-SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+# Railway sometimes gives postgres:// — convert to asyncpg
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://")
 
-def get_session():
-    return SessionLocal()
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    future=True
+)
 
-def init_db():
-    # Import models to ensure they are registered with metadata
-    from database import models
-    models.Base.metadata.create_all(bind=engine)
+SessionLocal = async_sessionmaker(
+    engine,
+    autoflush=False,
+    autocommit=False,
+    expire_on_commit=False
+)
+
+Base = declarative_base()
+
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+async def get_session():
+    async with SessionLocal() as session:
+        yield session

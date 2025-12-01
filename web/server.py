@@ -1,5 +1,7 @@
 # web/server.py
 import os
+import asyncio
+from database.db import init_db
 from flask import Flask, request, jsonify
 from database.db import init_db, get_session
 from database.models import Deposit, User
@@ -8,7 +10,8 @@ from decimal import Decimal
 app = Flask(__name__)
 
 # Initialize DB tables on startup (safe for Railway)
-init_db()
+asyncio.run(init_db())
+
 
 TASKER_SECRET = os.getenv("TASKER_SECRET_KEY", "change_me")
 BOT_WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")  # if using webhooks later
